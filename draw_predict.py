@@ -145,7 +145,7 @@ while running:
         pygame.draw.circle(WINDOW, BLACK, (x, y), BRUSH_RADIUS)
 
     if prediction_text:
-        text_surface = font.render(f"Pred: {prediction_text}", True, (0, 0, 255))
+        text_surface = font.render(f"Prediction: {prediction_text}", True, (105, 125, 255))
         WINDOW.blit(text_surface, (10, 10))
 
     pygame.display.flip()

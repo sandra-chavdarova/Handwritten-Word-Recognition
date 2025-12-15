@@ -169,7 +169,7 @@ while running:
 
     # show prediction at bottom
     if prediction_text:
-        text_surface = font.render(f"Pred: {prediction_text}", True, (0, 0, 255))
+        text_surface = font.render(f"Prediction: {prediction_text}", True, (105, 125, 255))
         # clear a strip at bottom so text stays readable
         pygame.draw.rect(WINDOW, WHITE, (0, HEIGHT - 40, WIDTH, 40))
         WINDOW.blit(text_surface, (10, HEIGHT - 35))
