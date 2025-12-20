@@ -8,8 +8,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 import scipy.ndimage
 
-
 # ---------------- CNN definition ----------------
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
 
 class SimpleCNN(nn.Module):
     def __init__(self, num_classes):
@@ -33,12 +37,13 @@ class SimpleCNN(nn.Module):
 # ---------------- load letter model ----------------
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print("Using device:", device)
-print("Letter model file exists:", os.path.exists("letter_cnn_26cls.pth"))
+
+digit_model = SimpleCNN(num_classes=10).to(device)
+digit_model.load_state_dict(torch.load("digit_cnn_10cls.pth", map_location=device))
+digit_model.eval()
 
 letter_model = SimpleCNN(num_classes=26).to(device)
-letter_state = torch.load("letter_cnn_26cls.pth", map_location=device)
-letter_model.load_state_dict(letter_state)
+letter_model.load_state_dict(torch.load("letter_cnn_26cls.pth", map_location=device))
 letter_model.eval()
 
 # ---------------- Pygame setup ----------------
@@ -46,7 +51,7 @@ letter_model.eval()
 pygame.init()
 WIDTH, HEIGHT = 400, 200  # wider canvas for words
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Draw a WORD (uppercase letters)")
+pygame.display.set_caption("Draw a WORD (digits or uppercase letters)")
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BRUSH_RADIUS = 4
@@ -114,8 +119,8 @@ def crop_and_preprocess(arr, box):
 
 def predict_word(surface):
     """
-    Takes the whole canvas, splits it into characters, predicts each one,
-    and returns the predicted word string.
+    Takes the whole canvas, splits it into characters, predicts each one
+    using digit_model and letter_model, and returns the predicted string.
     """
     data = pygame.image.tostring(surface, "RGB")
     img = Image.frombytes("RGB", (WIDTH, HEIGHT), data).convert("L")
@@ -125,18 +130,34 @@ def predict_word(surface):
     if not boxes:
         return "No drawing"
 
-    letters = []
+    chars = []
     with torch.no_grad():
         for box in boxes:
-            char_tensor = crop_and_preprocess(arr, box)
-            logits = letter_model(char_tensor)
-            probs = torch.softmax(logits, dim=1)
-            _, pred = probs.max(dim=1)
-            pred = pred.item()
-            ch = chr(ord("A") + pred)  # 0->A
-            letters.append(ch)
+            char_tensor = crop_and_preprocess(arr, box)  # (1,1,28,28)
 
-    return "".join(letters)
+            # run both models, like in your digit/letter script
+            d_logits = digit_model(char_tensor)
+            l_logits = letter_model(char_tensor)
+
+            d_probs = torch.softmax(d_logits, dim=1)
+            l_probs = torch.softmax(l_logits, dim=1)
+
+            d_conf, d_pred = d_probs.max(dim=1)
+            l_conf, l_pred = l_probs.max(dim=1)
+
+            d_conf = d_conf.item()
+            l_conf = l_conf.item()
+            d_pred = d_pred.item()
+            l_pred = l_pred.item()
+
+            if d_conf >= l_conf:
+                ch = str(d_pred)  # 0–9
+            else:
+                ch = chr(ord("A") + l_pred)  # A–Z
+
+            chars.append(ch)
+
+    return "".join(chars)
 
 
 # ---------------- main loop ----------------
