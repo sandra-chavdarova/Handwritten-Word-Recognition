@@ -67,8 +67,6 @@ def reset_canvas():
 reset_canvas()
 
 
-# ---------------- segmentation helpers ----------------
-
 def extract_character_boxes(arr, thresh=250, min_pixels=30):
     """
     arr: 2D grayscale numpy array (H,W)
@@ -133,9 +131,8 @@ def predict_word(surface):
     chars = []
     with torch.no_grad():
         for box in boxes:
-            char_tensor = crop_and_preprocess(arr, box)  # (1,1,28,28)
+            char_tensor = crop_and_preprocess(arr, box)
 
-            # run both models, like in your digit/letter script
             d_logits = digit_model(char_tensor)
             l_logits = letter_model(char_tensor)
 
@@ -151,16 +148,15 @@ def predict_word(surface):
             l_pred = l_pred.item()
 
             if d_conf >= l_conf:
-                ch = str(d_pred)  # 0–9
+                ch = str(d_pred)
             else:
-                ch = chr(ord("A") + l_pred)  # A–Z
+                ch = chr(ord("A") + l_pred)
 
             chars.append(ch)
 
     return "".join(chars)
 
 
-# ---------------- main loop ----------------
 
 running = True
 drawing = False
@@ -188,10 +184,8 @@ while running:
         x, y = pygame.mouse.get_pos()
         pygame.draw.circle(WINDOW, BLACK, (x, y), BRUSH_RADIUS)
 
-    # show prediction at bottom
     if prediction_text:
         text_surface = font.render(f"Prediction: {prediction_text}", True, (105, 125, 255))
-        # clear a strip at bottom so text stays readable
         pygame.draw.rect(WINDOW, WHITE, (0, HEIGHT - 40, WIDTH, 40))
         WINDOW.blit(text_surface, (10, HEIGHT - 35))
 

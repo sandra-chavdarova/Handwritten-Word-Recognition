@@ -7,7 +7,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# ---------------- CNN definition ----------------
 
 class SimpleCNN(nn.Module):
     def __init__(self, num_classes):
@@ -27,7 +26,7 @@ class SimpleCNN(nn.Module):
         x = F.relu(self.fc1(x))
         return self.fc2(x)
 
-# ---------------- load both models ----------------
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -41,8 +40,8 @@ letter_state = torch.load("letter_cnn_26cls.pth", map_location=device)
 letter_model.load_state_dict(letter_state)
 letter_model.eval()
 
-# ---------------- Pygame setup ----------------
 
+# pygame
 pygame.init()
 WIDTH, HEIGHT = 280, 280  # 10x 28x28
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -59,7 +58,7 @@ def reset_canvas():
 
 reset_canvas()
 
-# ---------------- preprocessing ----------------
+
 
 def preprocess_surface(surface):
     data = pygame.image.tostring(surface, "RGB")
@@ -93,7 +92,7 @@ def preprocess_surface(surface):
     tensor = torch.from_numpy(arr).to(device)
     return tensor
 
-# ---------------- main loop ----------------
+
 
 running = True
 drawing = False

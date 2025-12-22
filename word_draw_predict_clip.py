@@ -24,7 +24,6 @@ BLUE = (80, 110, 255)
 DEBUG_DIR = "debug_chars"
 os.makedirs(DEBUG_DIR, exist_ok=True)
 
-# ================= MODEL =================
 class ClipCharClassifier(nn.Module):
     def __init__(self, clip_model, num_classes=36):
         super().__init__()
@@ -47,7 +46,7 @@ model = ClipCharClassifier(clip_model).to(device)
 model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
 model.eval()
 
-# ================= PYGAME =================
+
 pygame.init()
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Draw Letters / Words")
@@ -60,7 +59,7 @@ reset_canvas()
 prediction_text = ""
 drawing = False
 
-# ================= SEGMENTATION =================
+
 def extract_character_boxes(arr, thresh=240, min_pixels=400):
     mask = (arr < thresh).astype(np.uint8)
     mask = scipy.ndimage.binary_closing(mask, iterations=2).astype(np.uint8)
@@ -97,7 +96,7 @@ def crop_and_preprocess_clip(arr, box, idx):
     img_rgb = canvas28.convert("RGB")
     return clip_preprocess(img_rgb).unsqueeze(0).to(device)
 
-# ================= PREDICTION =================
+
 def predict_character(img_tensor):
     with torch.no_grad():
         logits = model(img_tensor)
@@ -122,7 +121,7 @@ def predict_word(surface):
 
     return "".join(preds)
 
-# ================= MAIN LOOP =================
+
 running = True
 
 while running:
