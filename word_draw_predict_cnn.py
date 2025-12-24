@@ -8,8 +8,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import scipy.ndimage
 
-# ---------------- CNN definition ----------------
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -34,7 +32,6 @@ class SimpleCNN(nn.Module):
         return self.fc2(x)
 
 
-# ---------------- load letter model ----------------
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -46,7 +43,7 @@ letter_model = SimpleCNN(num_classes=26).to(device)
 letter_model.load_state_dict(torch.load("letter_cnn_26cls.pth", map_location=device))
 letter_model.eval()
 
-# ---------------- Pygame setup ----------------
+# pygame
 
 pygame.init()
 WIDTH, HEIGHT = 400, 200  # wider canvas for words
@@ -109,7 +106,7 @@ def crop_and_preprocess(arr, box):
     canvas28.paste(crop, (cx - w // 2, cy - h // 2))
 
     a = np.array(canvas28).astype(np.float32)
-    a = 255.0 - a  # invert to match training; remove if needed
+    a = 255.0 - a  # invert
     a /= 255.0
     a = a.reshape(1, 1, 28, 28)
     return torch.from_numpy(a).to(device)
@@ -155,7 +152,6 @@ def predict_word(surface):
             chars.append(ch)
 
     return "".join(chars)
-
 
 
 running = True

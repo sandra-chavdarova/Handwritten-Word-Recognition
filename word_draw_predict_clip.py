@@ -8,7 +8,6 @@ import torch.nn as nn
 import scipy.ndimage
 import clip
 
-# ================= CONFIG =================
 WIDTH, HEIGHT = 1000, 500
 BRUSH_RADIUS = 10
 FONT_SIZE = 48

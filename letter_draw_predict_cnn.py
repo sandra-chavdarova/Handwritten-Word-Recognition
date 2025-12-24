@@ -13,10 +13,10 @@ class SimpleCNN(nn.Module):
         super().__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, padding=1)
         self.conv2 = nn.Conv2d(32, 64, 3, padding=1)
-        self.pool  = nn.MaxPool2d(2, 2)
+        self.pool = nn.MaxPool2d(2, 2)
         self.conv3 = nn.Conv2d(64, 128, 3, padding=1)
-        self.fc1   = nn.Linear(128 * 7 * 7, 256)
-        self.fc2   = nn.Linear(256, num_classes)
+        self.fc1 = nn.Linear(128 * 7 * 7, 256)
+        self.fc2 = nn.Linear(256, num_classes)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
@@ -25,7 +25,6 @@ class SimpleCNN(nn.Module):
         x = x.view(x.size(0), -1)
         x = F.relu(self.fc1(x))
         return self.fc2(x)
-
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -40,7 +39,6 @@ letter_state = torch.load("letter_cnn_26cls.pth", map_location=device)
 letter_model.load_state_dict(letter_state)
 letter_model.eval()
 
-
 # pygame
 pygame.init()
 WIDTH, HEIGHT = 280, 280  # 10x 28x28
@@ -53,11 +51,12 @@ BRUSH_RADIUS = 4
 font = pygame.font.SysFont(None, 40)
 prediction_text = ""
 
+
 def reset_canvas():
     WINDOW.fill(WHITE)
 
-reset_canvas()
 
+reset_canvas()
 
 
 def preprocess_surface(surface):
@@ -66,7 +65,6 @@ def preprocess_surface(surface):
 
     arr = np.array(img).astype(np.uint8)
 
-    # Find bounding box of drawing
     thresh = 250
     ys, xs = np.where(arr < thresh)
     if len(xs) == 0 or len(ys) == 0:
@@ -74,7 +72,7 @@ def preprocess_surface(surface):
 
     x_min, x_max = xs.min(), xs.max()
     y_min, y_max = ys.min(), ys.max()
-    arr = arr[y_min:y_max+1, x_min:x_max+1]
+    arr = arr[y_min:y_max + 1, x_min:x_max + 1]
 
     crop = Image.fromarray(arr)
     crop.thumbnail((20, 20), Image.LANCZOS)
@@ -85,13 +83,12 @@ def preprocess_surface(surface):
     canvas28.paste(crop, (cx - w // 2, cy - h // 2))
 
     arr = np.array(canvas28).astype(np.float32)
-    arr = 255.0 - arr    # if this gives bad results, remove this line
+    arr = 255.0 - arr
     arr /= 255.0
 
     arr = arr.reshape(1, 1, 28, 28)
     tensor = torch.from_numpy(arr).to(device)
     return tensor
-
 
 
 running = True
