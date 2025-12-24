@@ -29,12 +29,12 @@ class SimpleCNN(nn.Module):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 digit_model = SimpleCNN(num_classes=10).to(device)
-digit_state = torch.load("digit_cnn_10cls.pth", map_location=device)
+digit_state = torch.load("digit_cnn_10cls.pth", map_location=device, weights_only=False)
 digit_model.load_state_dict(digit_state)
 digit_model.eval()
 
 letter_model = SimpleCNN(num_classes=26).to(device)
-letter_state = torch.load("letter_cnn_26cls.pth", map_location=device)
+letter_state = torch.load("letter_cnn_26cls.pth", map_location=device, weights_only=False)
 letter_model.load_state_dict(letter_state)
 letter_model.eval()
 
