@@ -5,14 +5,16 @@ Instead of training separate CNNs for letters and digits (like explained later),
 The trained models are used in a PyGame application, where users can draw a character, digit or word and get a prediction for what is written on the canvas.
 
 ### How it Works
-CLIP Feature Extraction
+  **CLIP Feature Extraction**
 - The user’s drawing is captured from a PyGame canvas.
 - The image is converted to a standardized grayscale or RGB format.
 - The processed image is passed through CLIP’s image encoder to extract embeddings.
-Text Prompts
+
+<br>**Text Prompts**
 - All possible classes (digits 0–9 and letters A–Z) are encoded using CLIP’s text encoder.
 - Predictions are made by finding the closest text embedding to the image embedding (cosine similarity).
-Word Recognition
+
+<br>**Word Recognition**
 - For multi-character words, the canvas is segmented into individual characters.
 - Each character is independently encoded and compared to text embeddings.
 - Character predictions are combined into a final word.
